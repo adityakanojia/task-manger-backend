@@ -3,7 +3,7 @@ require('dotenv').config();
 const mongoose = require('mongoose')
 const app = express();
 
-const route = require('./routes/authenticationRoutes.js')
+const route = require('./routes/routes.js')
 
 const port = process.env.PORT || 3000;
 const connectionString = process.env.DB_CONNECTION_STRING;
