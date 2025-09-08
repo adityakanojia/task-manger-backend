@@ -17,7 +17,10 @@ const registerHandler = async (req, res) => {
         const newUser = await User.create({name, username, password});     
         
         const token = jwt.sign({id: newUser._id, username: newUser.username},jwt_secret_key,{expiresIn: "1d"})
-        
+        res.setHeader(
+            "Set-Cookie",
+            `token=${token}; HttpOnly; Path=/; Max-Age=${60*60*24}`
+        );
         return res.status(200).json({
             message: "authenticated Successfully",
             user: {id: newUser._id,
@@ -44,6 +47,11 @@ const loginUser = async (req, res) => {
         if(!comparingHashedPassword) return res.status(400).send("Invalid credentials");
         
         const token = jwt.sign({id: user._id, username: user.username}, jwt_secret_key, {expiresIn : "1d"});
+
+        res.setHeader(
+            "Set-Cookie",
+            `token=${token}; HttpOnly; Path=/; Max-Age=${60*60*24}`
+        );
 
         return res.status(200).json({
             message : "logged is succesfully",

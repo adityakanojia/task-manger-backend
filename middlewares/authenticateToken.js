@@ -4,8 +4,8 @@ const jwt_secret_key = process.env.JWT_SECRET_KEY;
 
 function authenticateToken (req,res,next){
     const authHeader = req.headers['authorization'];
-    //bearer token
-    const token = authHeader && authHeader.split(" ")[1];
+    //bearer token and cookie
+    const token = req.cookies.token || authHeader && authHeader.split(" ")[1];
     if(!token) res.status(403).send("no token found")
     
     jwt.verify(token, jwt_secret_key, (err, decoded) => {
