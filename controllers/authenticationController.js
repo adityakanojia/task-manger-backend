@@ -7,12 +7,14 @@ require('dotenv').config()
 
 const jwt_secret_key = process.env.JWT_SECRET_KEY;
 
+
+// Registering a user
 const registerHandler = async (req, res) => {
     try {
         const {name, username, password} = req.body;
         const user = await User.findOne({username});
 
-        if(user) return res.status(400).send("User already exist")
+        if(user) return res.status(400).send("User already exist") // will handle the validation in frontend
     
         const newUser = await User.create({name, username, password});     
         
@@ -33,5 +35,26 @@ const registerHandler = async (req, res) => {
     }
 }
 
+const loginUser = async (req, res) => {
+    try {
+        const {username, password} = req.body;
+        const user = await User.findOne({username});
+    
+        if(!user) return res.status(400).send("Invalid credentials");
 
-module.exports = {registerHandler}
+        const comparingHashedPassword = await bcrypt.compare(password, user.password);
+        if(!comparingHashedPassword) return res.status(400).send("Invalid credentials");
+        
+        const token = jwt.sign({id: user._id, username: user.username}, jwt_secret_key, {expiresIn : "1d"});
+
+        return res.status(200).json({
+            message : "logged is succesfully",
+            token
+        });
+
+    } catch (error) {
+        res.status(500).send("server error");
+    }  
+}
+
+module.exports = { registerHandler, loginUser }
